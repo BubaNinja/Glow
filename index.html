@@ -489,7 +489,10 @@ const masters = [
         {name:'RF-лифтинг',price:'5 000 р.'},
         {name:'Макияж дневной',price:'2 500 р.'},
         {name:'Макияж вечерний',price:'4 000 р.'},
-      ]
+      ],
+      // groups of mutually exclusive indices
+      exclusive:[[2,3],[3,4],[5,6]]
+      // мезо vs биоревит, биоревит vs RF, дневной vs вечерний макияж
     },
     { name:'Дмитрий Волков', role:'Стилист / Колорист', photo:'images/master-dmitriy.jpg',
       services:[
@@ -500,7 +503,9 @@ const masters = [
         {name:'Кератиновое выпрямление',price:'7 500 р.'},
         {name:'Укладка',price:'1 500 р.'},
         {name:'Ботокс для волос',price:'5 000 р.'},
-      ]
+      ],
+      exclusive:[[0,1],[2,3],[4,6]]
+      // жен vs муж стрижка, окрашивание vs балаяж, кератин vs ботокс
     },
     { name:'Мария Тишина', role:'Мастер маникюра', photo:'images/master-maria.jpg',
       services:[
@@ -510,7 +515,9 @@ const masters = [
         {name:'Дизайн ногтей',price:'500 р.'},
         {name:'Снятие + маникюр',price:'2 500 р.'},
         {name:'Укрепление',price:'800 р.'},
-      ]
+      ],
+      exclusive:[[0,2,4]]
+      // маникюр vs наращивание vs снятие+маникюр (все три -- базовая услуга)
     },
 ];
 
@@ -534,11 +541,32 @@ function openMaster(i) {
 }
 
 function toggleService(masterIdx, svcIdx, el) {
-    el.classList.toggle('selected');
-    const svc = masters[masterIdx].services[svcIdx];
-    const idx = selectedServices.findIndex(s => s.name === svc.name);
-    if (idx >= 0) selectedServices.splice(idx, 1);
-    else selectedServices.push(svc);
+    const m = masters[masterIdx];
+    const isSelecting = !el.classList.contains('selected');
+
+    if (isSelecting) {
+        // Find and deselect any exclusive services
+        const excGroups = m.exclusive || [];
+        excGroups.forEach(group => {
+            if (group.includes(svcIdx)) {
+                group.forEach(exIdx => {
+                    if (exIdx !== svcIdx) {
+                        const exEl = document.querySelectorAll('#mmServices .mm-svc')[exIdx];
+                        if (exEl && exEl.classList.contains('selected')) {
+                            exEl.classList.remove('selected');
+                            selectedServices = selectedServices.filter(s => s.name !== m.services[exIdx].name);
+                        }
+                    }
+                });
+            }
+        });
+        el.classList.add('selected');
+        selectedServices.push(m.services[svcIdx]);
+    } else {
+        el.classList.remove('selected');
+        selectedServices = selectedServices.filter(s => s.name !== m.services[svcIdx].name);
+    }
+
     // Update total
     const total = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace(/\D/g, '')), 0);
     const totalEl = document.getElementById('mmTotal');
@@ -556,12 +584,18 @@ function bookWithServices() {
     const sel = document.getElementById('masterSelect');
     sel.value = currentMasterIdx;
     updateServices();
-    // Pre-select first chosen service if any
     if (selectedServices.length > 0) {
         setTimeout(() => {
             const svcSel = document.getElementById('serviceSelect');
+            // Select all that match
             for (let opt of svcSel.options) {
-                if (opt.value === selectedServices[0].name) { opt.selected = true; break; }
+                opt.selected = selectedServices.some(s => s.name === opt.value);
+            }
+            // If single select, pick first
+            if (!svcSel.multiple && selectedServices.length > 0) {
+                for (let opt of svcSel.options) {
+                    if (opt.value === selectedServices[0].name) { opt.selected = true; break; }
+                }
             }
         }, 50);
     }
