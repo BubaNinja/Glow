@@ -298,8 +298,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Чистка лица</span><span class="master-svc-price">3 500 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Пилинг</span><span class="master-svc-price">2 800 р.</span></div>
                 </div>
-                <button class="master-btn">Записаться к Анне</button>
-                <div class="master-more">Все услуги и цены</div>
+                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=0;bookMaster()">Записаться к Анне</button>
+                <div class="master-more">Подробнее: все услуги и цены</div>
             </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(1)">
@@ -311,8 +311,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Стрижка</span><span class="master-svc-price">2 500 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Окрашивание</span><span class="master-svc-price">6 000 р.</span></div>
                 </div>
-                <button class="master-btn">Записаться к Дмитрию</button>
-                <div class="master-more">Все услуги и цены</div>
+                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=1;bookMaster()">Записаться к Дмитрию</button>
+                <div class="master-more">Подробнее: все услуги и цены</div>
             </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(2)">
@@ -324,8 +324,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Маникюр + покрытие</span><span class="master-svc-price">2 200 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Наращивание</span><span class="master-svc-price">4 500 р.</span></div>
                 </div>
-                <button class="master-btn">Записаться к Марии</button>
-                <div class="master-more">Все услуги и цены</div>
+                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=2;bookMaster()">Записаться к Марии</button>
+                <div class="master-more">Подробнее: все услуги и цены</div>
             </div>
         </div>
     </div>
@@ -377,14 +377,22 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
     <p class="booking-trigger reveal">Скидка 10% на первый визит</p>
     <div class="booking-form reveal">
         <form onsubmit="handleSubmit(event)">
-            <div class="fg">
-                <label>Мастер</label>
-                <select name="master" required>
-                    <option value="">Выберите мастера</option>
-                    <option>Анна Светлова -- косметология</option>
-                    <option>Дмитрий Волков -- волосы</option>
-                    <option>Мария Тишина -- ногти</option>
-                </select>
+            <div class="form-row">
+                <div class="fg">
+                    <label>Мастер</label>
+                    <select name="master" id="masterSelect" required onchange="updateServices()">
+                        <option value="">Выберите мастера</option>
+                        <option value="0">Анна Светлова -- косметология</option>
+                        <option value="1">Дмитрий Волков -- волосы</option>
+                        <option value="2">Мария Тишина -- ногти</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label>Услуга</label>
+                    <select name="service" id="serviceSelect" required>
+                        <option value="">Сначала выберите мастера</option>
+                    </select>
+                </div>
             </div>
             <div class="form-row">
                 <div class="fg"><label>Имя</label><input type="text" name="name" placeholder="Ваше имя" required></div>
@@ -449,7 +457,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
             <div><div class="mm-name" id="mmName"></div><div class="mm-role" id="mmRole"></div></div>
         </div>
         <div class="mm-services" id="mmServices"></div>
-        <button class="mm-book" onclick="document.getElementById('masterModal').classList.remove('active');document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Записаться</button>
+        <button class="mm-book" onclick="bookMaster()">Выбрать услугу и записаться</button>
     </div>
 </div>
 
@@ -501,7 +509,10 @@ const masters = [
     },
 ];
 
+let currentMasterIdx = null;
+
 function openMaster(i) {
+    currentMasterIdx = i;
     const m = masters[i];
     document.getElementById('mmAvatar').src = m.photo;
     document.getElementById('mmName').textContent = m.name;
@@ -510,6 +521,27 @@ function openMaster(i) {
         `<div class="mm-svc"><span class="mm-svc-name">${s.name}</span><span class="mm-svc-price">${s.price}</span></div>`
     ).join('');
     document.getElementById('masterModal').classList.add('active');
+}
+
+function bookMaster() {
+    document.getElementById('masterModal').classList.remove('active');
+    const sel = document.getElementById('masterSelect');
+    sel.value = currentMasterIdx;
+    updateServices();
+    document.getElementById('booking').scrollIntoView({behavior:'smooth'});
+}
+
+function updateServices() {
+    const sel = document.getElementById('masterSelect');
+    const svcSel = document.getElementById('serviceSelect');
+    const idx = sel.value;
+    if (idx === '') {
+        svcSel.innerHTML = '<option value="">Сначала выберите мастера</option>';
+        return;
+    }
+    const m = masters[parseInt(idx)];
+    svcSel.innerHTML = '<option value="">Выберите услугу</option>' +
+        m.services.map(s => `<option value="${s.name}">${s.name} -- ${s.price}</option>`).join('');
 }
 
 // Nav
@@ -544,6 +576,7 @@ function handleSubmit(e) {
     const fd = new FormData(form);
     const text = `Новая запись GLOW:%0A` +
         `Мастер: ${fd.get('master')||'-'}%0A` +
+        `Услуга: ${fd.get('service')||'-'}%0A` +
         `Имя: ${fd.get('name')||'-'}%0A` +
         `Тел: ${fd.get('phone')||'-'}%0A` +
         `Дата: ${fd.get('date')||'-'}%0A` +
