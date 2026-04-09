@@ -208,7 +208,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
 .mm-name{font-size:1.1rem;color:var(--white)}
 .mm-role{font-size:0.82rem;color:var(--pink)}
 .mm-services{display:flex;flex-direction:column;gap:0}
-.mm-svc{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--glass-border)}
+.mm-svc{display:flex;justify-content:space-between;align-items:center;padding:10px 8px;border-bottom:1px solid var(--glass-border);cursor:pointer;transition:background 0.3s;border-radius:6px}
+.mm-svc:hover{background:var(--pink-dim)}
 .mm-svc-name{font-size:0.9rem;color:var(--text-bright)}
 .mm-svc-price{font-size:0.95rem;color:var(--peach);font-weight:600}
 .mm-book{width:100%;margin-top:1.5rem;background:linear-gradient(135deg,var(--pink),var(--violet));color:var(--white);border:none;padding:14px;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s}
@@ -298,9 +299,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Чистка лица</span><span class="master-svc-price">3 500 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Пилинг</span><span class="master-svc-price">2 800 р.</span></div>
                 </div>
-                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=0;bookMaster()">Записаться к Анне</button>
-                <div class="master-more">Подробнее: все услуги и цены</div>
-            </div>
+                <button class="master-btn" onclick="event.stopPropagation();openMaster(0)">Записаться к Анне</button>
+                            </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(1)">
             <img class="master-img" src="images/master-dmitriy.jpg" alt="Дмитрий" loading="lazy">
@@ -311,9 +311,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Стрижка</span><span class="master-svc-price">2 500 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Окрашивание</span><span class="master-svc-price">6 000 р.</span></div>
                 </div>
-                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=1;bookMaster()">Записаться к Дмитрию</button>
-                <div class="master-more">Подробнее: все услуги и цены</div>
-            </div>
+                <button class="master-btn" onclick="event.stopPropagation();openMaster(1)">Записаться к Дмитрию</button>
+                            </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(2)">
             <img class="master-img" src="images/master-maria.jpg" alt="Мария" loading="lazy">
@@ -324,9 +323,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     <div class="master-svc"><span class="master-svc-name">Маникюр + покрытие</span><span class="master-svc-price">2 200 р.</span></div>
                     <div class="master-svc"><span class="master-svc-name">Наращивание</span><span class="master-svc-price">4 500 р.</span></div>
                 </div>
-                <button class="master-btn" onclick="event.stopPropagation();currentMasterIdx=2;bookMaster()">Записаться к Марии</button>
-                <div class="master-more">Подробнее: все услуги и цены</div>
-            </div>
+                <button class="master-btn" onclick="event.stopPropagation();openMaster(2)">Записаться к Марии</button>
+                            </div>
         </div>
     </div>
 </section>
@@ -457,7 +455,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
             <div><div class="mm-name" id="mmName"></div><div class="mm-role" id="mmRole"></div></div>
         </div>
         <div class="mm-services" id="mmServices"></div>
-        <button class="mm-book" onclick="bookMaster()">Выбрать услугу и записаться</button>
+        <button class="mm-book" onclick="bookMaster()">Записаться без выбора услуги</button>
     </div>
 </div>
 
@@ -518,7 +516,7 @@ function openMaster(i) {
     document.getElementById('mmName').textContent = m.name;
     document.getElementById('mmRole').textContent = m.role;
     document.getElementById('mmServices').innerHTML = m.services.map(s =>
-        `<div class="mm-svc"><span class="mm-svc-name">${s.name}</span><span class="mm-svc-price">${s.price}</span></div>`
+        `<div class="mm-svc" onclick="pickService('${s.name}')" style="cursor:pointer;transition:background 0.3s;border-radius:6px;padding:10px 8px"><span class="mm-svc-name">${s.name}</span><span class="mm-svc-price">${s.price}</span></div>`
     ).join('');
     document.getElementById('masterModal').classList.add('active');
 }
@@ -528,6 +526,21 @@ function bookMaster() {
     const sel = document.getElementById('masterSelect');
     sel.value = currentMasterIdx;
     updateServices();
+    document.getElementById('booking').scrollIntoView({behavior:'smooth'});
+}
+
+function pickService(serviceName) {
+    document.getElementById('masterModal').classList.remove('active');
+    const sel = document.getElementById('masterSelect');
+    sel.value = currentMasterIdx;
+    updateServices();
+    // Pre-select the clicked service
+    setTimeout(() => {
+        const svcSel = document.getElementById('serviceSelect');
+        for (let opt of svcSel.options) {
+            if (opt.value === serviceName) { opt.selected = true; break; }
+        }
+    }, 50);
     document.getElementById('booking').scrollIntoView({behavior:'smooth'});
 }
 
