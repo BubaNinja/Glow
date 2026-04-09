@@ -290,7 +290,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
     </div>
     <div class="masters-grid">
         <div class="master-card reveal" onclick="openMaster(0)">
-            <img class="master-img" src="images/face.jpg" alt="Анна" loading="lazy">
+            <img class="master-img" src="images/master-anna.jpg" alt="Анна" loading="lazy">
             <div class="master-info">
                 <h3 class="master-name">Анна Светлова</h3>
                 <div class="master-role">Косметолог / Визажист</div>
@@ -303,7 +303,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
             </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(1)">
-            <img class="master-img" src="images/hair.jpg" alt="Дмитрий" loading="lazy">
+            <img class="master-img" src="images/master-dmitriy.jpg" alt="Дмитрий" loading="lazy">
             <div class="master-info">
                 <h3 class="master-name">Дмитрий Волков</h3>
                 <div class="master-role">Стилист / Колорист</div>
@@ -316,7 +316,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
             </div>
         </div>
         <div class="master-card reveal" onclick="openMaster(2)">
-            <img class="master-img" src="images/nails.jpg" alt="Мария" loading="lazy">
+            <img class="master-img" src="images/master-maria.jpg" alt="Мария" loading="lazy">
             <div class="master-info">
                 <h3 class="master-name">Мария Тишина</h3>
                 <div class="master-role">Мастер маникюра</div>
@@ -361,9 +361,9 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
     </div>
     <div class="gallery-grid reveal">
         <div class="gi"><img src="images/interior.jpg" alt="Интерьер" loading="lazy"></div>
-        <div class="gi"><img src="images/face.jpg" alt="Косметология" loading="lazy"></div>
-        <div class="gi"><img src="images/hair.jpg" alt="Волосы" loading="lazy"></div>
-        <div class="gi"><img src="images/nails.jpg" alt="Ногти" loading="lazy"></div>
+        <div class="gi"><img src="images/master-anna.jpg" alt="Косметология" loading="lazy"></div>
+        <div class="gi"><img src="images/master-dmitriy.jpg" alt="Волосы" loading="lazy"></div>
+        <div class="gi"><img src="images/master-maria.jpg" alt="Ногти" loading="lazy"></div>
         <div class="gi"><img src="images/products.jpg" alt="Продукты" loading="lazy"></div>
     </div>
 </section>
@@ -467,7 +467,7 @@ document.getElementById('maxIcon').src = "data:image/jpeg;base64," + "/9j/4AAQSk
 
 // Masters data
 const masters = [
-    { name:'Анна Светлова', role:'Косметолог / Визажист', photo:'images/face.jpg',
+    { name:'Анна Светлова', role:'Косметолог / Визажист', photo:'images/master-anna.jpg',
       services:[
         {name:'Чистка лица',price:'3 500 р.'},
         {name:'Пилинг',price:'2 800 р.'},
@@ -478,7 +478,7 @@ const masters = [
         {name:'Макияж вечерний',price:'4 000 р.'},
       ]
     },
-    { name:'Дмитрий Волков', role:'Стилист / Колорист', photo:'images/hair.jpg',
+    { name:'Дмитрий Волков', role:'Стилист / Колорист', photo:'images/master-dmitriy.jpg',
       services:[
         {name:'Стрижка женская',price:'2 500 р.'},
         {name:'Стрижка мужская',price:'1 800 р.'},
@@ -489,7 +489,7 @@ const masters = [
         {name:'Ботокс для волос',price:'5 000 р.'},
       ]
     },
-    { name:'Мария Тишина', role:'Мастер маникюра', photo:'images/nails.jpg',
+    { name:'Мария Тишина', role:'Мастер маникюра', photo:'images/master-maria.jpg',
       services:[
         {name:'Маникюр + покрытие',price:'2 200 р.'},
         {name:'Педикюр + покрытие',price:'2 800 р.'},
