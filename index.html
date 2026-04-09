@@ -128,8 +128,8 @@ nav.scrolled{background:rgba(14,10,20,0.85);backdrop-filter:blur(24px);border-bo
 
 /* ABOUT */
 .about-section{padding:6rem 5vw;border-top:1px solid var(--glass-border)}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:1000px;margin:0 auto;align-items:center}
-.about-img{width:100%;border-radius:16px;filter:brightness(0.85);aspect-ratio:4/3;object-fit:cover}
+.about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:4rem;max-width:1000px;margin:0 auto;align-items:center}
+.about-img{width:100%;border-radius:16px;filter:brightness(0.85);aspect-ratio:3/2;object-fit:cover}
 .about-text p{font-size:0.95rem;line-height:1.9;color:var(--text);margin-bottom:1rem}
 .about-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
 .about-tag{font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-bright);letter-spacing:0.03em}
@@ -156,6 +156,18 @@ nav.scrolled{background:rgba(14,10,20,0.85);backdrop-filter:blur(24px);border-bo
 .booking-form select option{background:var(--bg2)}
 .booking-form textarea{resize:vertical;min-height:80px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.form-svc-list{display:flex;flex-direction:column;gap:0;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:8px;overflow:hidden;max-height:200px;overflow-y:auto}
+.form-svc-list:empty::after{content:'Сначала выберите мастера';display:block;padding:13px 16px;color:var(--text-dim);font-size:14px}
+.form-svc-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;transition:background 0.2s;border-bottom:1px solid var(--glass-border);gap:8px}
+.form-svc-item:last-child{border-bottom:none}
+.form-svc-item:hover{background:rgba(255,255,255,0.03)}
+.form-svc-item.picked{background:var(--pink-dim)}
+.form-svc-item.disabled{opacity:0.3;pointer-events:none}
+.fsc{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--glass-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.form-svc-item.picked .fsc{background:var(--pink);border-color:var(--pink)}
+.form-svc-item.picked .fsc::after{content:'';width:5px;height:8px;border:solid var(--white);border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
+.fsn{font-size:13px;color:var(--text-bright);flex:1}
+.fsp{font-size:13px;color:var(--peach);font-weight:500}
 .btn-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--pink),var(--violet));color:var(--white);border:none;padding:15px;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.4s;box-shadow:0 4px 24px var(--pink-glow);margin-top:0.5rem}
 .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 36px var(--pink-glow)}
 .btn-submit .btn-spinner{display:none;width:18px;height:18px;border:2px solid transparent;border-top-color:var(--white);border-radius:50%;animation:spin 0.7s linear infinite}
@@ -392,10 +404,9 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
                     </select>
                 </div>
                 <div class="fg">
-                    <label>Услуга</label>
-                    <select name="service" id="serviceSelect" required>
-                        <option value="">Сначала выберите мастера</option>
-                    </select>
+                    <label>Услуги</label>
+                    <div id="formServices" class="form-svc-list"></div>
+                    <input type="hidden" name="service" id="formServiceHidden">
                 </div>
             </div>
             <div class="form-row">
@@ -584,35 +595,74 @@ function bookWithServices() {
     const sel = document.getElementById('masterSelect');
     sel.value = currentMasterIdx;
     updateServices();
-    if (selectedServices.length > 0) {
-        setTimeout(() => {
-            const svcSel = document.getElementById('serviceSelect');
-            // Select all that match
-            for (let opt of svcSel.options) {
-                opt.selected = selectedServices.some(s => s.name === opt.value);
-            }
-            // If single select, pick first
-            if (!svcSel.multiple && selectedServices.length > 0) {
-                for (let opt of svcSel.options) {
-                    if (opt.value === selectedServices[0].name) { opt.selected = true; break; }
-                }
-            }
-        }, 50);
-    }
     document.getElementById('booking').scrollIntoView({behavior:'smooth'});
 }
 
+let formSelected = [];
+
 function updateServices() {
     const sel = document.getElementById('masterSelect');
-    const svcSel = document.getElementById('serviceSelect');
+    const container = document.getElementById('formServices');
     const idx = sel.value;
-    if (idx === '') {
-        svcSel.innerHTML = '<option value="">Сначала выберите мастера</option>';
-        return;
-    }
+    formSelected = [];
+    updateFormHidden();
+    if (idx === '') { container.innerHTML = ''; return; }
     const m = masters[parseInt(idx)];
-    svcSel.innerHTML = '<option value="">Выберите услугу</option>' +
-        m.services.map(s => `<option value="${s.name}">${s.name} -- ${s.price}</option>`).join('');
+    container.innerHTML = m.services.map((s, i) =>
+        `<div class="form-svc-item" data-idx="${i}" onclick="toggleFormSvc(${parseInt(idx)},${i},this)"><div class="fsc"></div><span class="fsn">${s.name}</span><span class="fsp">${s.price}</span></div>`
+    ).join('');
+    // Pre-select from modal if coming from there
+    if (selectedServices.length > 0) {
+        selectedServices.forEach(ss => {
+            const svcIdx = m.services.findIndex(s => s.name === ss.name);
+            if (svcIdx >= 0) {
+                const el = container.children[svcIdx];
+                if (el) { el.classList.add('picked'); formSelected.push(m.services[svcIdx]); }
+            }
+        });
+        updateFormDisabled(parseInt(idx));
+        updateFormHidden();
+    }
+}
+
+function toggleFormSvc(masterIdx, svcIdx, el) {
+    const m = masters[masterIdx];
+    const isSelecting = !el.classList.contains('picked');
+    if (isSelecting) {
+        // Deselect exclusive
+        const excGroups = m.exclusive || [];
+        excGroups.forEach(group => {
+            if (group.includes(svcIdx)) {
+                group.forEach(exIdx => {
+                    if (exIdx !== svcIdx) {
+                        const exEl = document.querySelector(`#formServices .form-svc-item[data-idx="${exIdx}"]`);
+                        if (exEl && exEl.classList.contains('picked')) {
+                            exEl.classList.remove('picked');
+                            formSelected = formSelected.filter(s => s.name !== m.services[exIdx].name);
+                        }
+                    }
+                });
+            }
+        });
+        el.classList.add('picked');
+        formSelected.push(m.services[svcIdx]);
+    } else {
+        el.classList.remove('picked');
+        formSelected = formSelected.filter(s => s.name !== m.services[svcIdx].name);
+    }
+    updateFormDisabled(masterIdx);
+    updateFormHidden();
+}
+
+function updateFormDisabled(masterIdx) {
+    const m = masters[masterIdx];
+    const items = document.querySelectorAll('#formServices .form-svc-item');
+    items.forEach(el => el.classList.remove('disabled'));
+    // No disabling needed - exclusive items auto-deselect on click
+}
+
+function updateFormHidden() {
+    document.getElementById('formServiceHidden').value = formSelected.map(s => s.name).join(', ');
 }
 
 // Nav
