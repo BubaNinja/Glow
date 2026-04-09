@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BREWCRAFT -- Спешелти кофе от обжарщиков | Своя обжарка в Москве</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+<meta name="description" content="BREWCRAFT -- крафтовая кофейня со своей обжаркой. Зёрна из Эфиопии, Колумбии, Бразилии. 12 сортов, обжарка каждую неделю.">
+<meta property="og:title" content="BREWCRAFT -- Спешелти кофе от обжарщиков">
+<meta property="og:description" content="Своя обжарка, 12 сортов, зерно обжарено вчера. Кофейня в центре Москвы.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="images/hero.jpg">
+<meta property="og:locale" content="ru_RU">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #faf8f5;
+    --coffee: #6f4e37;
+    --coffee-light: #a07a5e;
+    --coffee-pale: #e8ddd3;
+    --coffee-dark: #4a3425;
+    --sage: #a8b5a0;
+    --sage-dark: #7a8a72;
+    --sage-pale: #dfe6db;
+    --dark: #2c2420;
+    --dark-50: rgba(44,36,32,0.5);
+    --dark-30: rgba(44,36,32,0.3);
+    --dark-10: rgba(44,36,32,0.08);
+    --white: #fff;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Manrope', sans-serif;
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+    font-family: var(--sans); background: var(--bg); color: var(--dark);
+    overflow-x: hidden; line-height: 1.7; font-weight: 400; font-size: 15px;
+}
+h1,h2,h3 { font-family: var(--serif); font-weight: 400; line-height: 1.15; }
+::selection { background: var(--coffee-pale); color: var(--dark); }
+
+/* NOISE */
+.bg-noise {
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.25;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    background-size:256px;
+}
+section,nav,footer { position:relative; z-index:1; }
+.bg-texture {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: url('images/background.jpg') center/cover fixed;
+    opacity:0.6;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { to { transform:rotate(360deg); } }
+.reveal {
+    opacity:0; transform:translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    animation: revealFB 0.8s ease 2s forwards;
+}
+.reveal.vis { opacity:1; transform:none; animation:none; }
+@keyframes revealFB { to { opacity:1; transform:none; } }
+
+/* ===== NAV ===== */
+nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:18px 32px;
+    display:flex; align-items:center; justify-content:center;
+    gap:3rem;
+    transition: all 0.4s;
+}
+nav.scrolled {
+    background:rgba(250,248,245,0.92);
+    backdrop-filter:blur(20px);
+    box-shadow:0 1px 0 var(--dark-10);
+    padding:14px 32px;
+}
+.nav-logo {
+    font-family:var(--serif); font-size:22px; color:var(--dark);
+    text-decoration:none; letter-spacing:0.08em;
+}
+.nav-links { display:flex; gap:2rem; list-style:none; }
+.nav-links a {
+    font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--dark); text-decoration:none; transition:color 0.3s;
+}
+.nav-links a:hover { color:var(--coffee); }
+.burger {
+    display:none; cursor:pointer; padding:4px;
+    flex-direction:column; gap:5px;
+    position:absolute; right:20px; top:18px;
+}
+.burger span { width:22px; height:1.5px; background:var(--dark); transition:all 0.3s; transform-origin:center; }
+.burger.active span:nth-child(1) { transform:rotate(45deg) translate(4.5px,4.5px); }
+.burger.active span:nth-child(2) { opacity:0; }
+.burger.active span:nth-child(3) { transform:rotate(-45deg) translate(4.5px,-4.5px); }
+
+/* ===== HERO ===== */
+.hero {
+    min-height:100vh;
+    display:grid; grid-template-columns:1fr 1fr;
+    align-items:center; gap:4rem;
+    padding:120px 6vw 80px;
+}
+.hero-text { animation:fadeUp 0.9s ease 0.2s both; }
+.hero-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:11px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--coffee); margin-bottom:1.5rem;
+}
+.hero-tag::before { content:''; width:24px; height:1.5px; background:var(--coffee-light); }
+.hero h1 {
+    font-size:clamp(2rem, 4vw, 3.2rem);
+    color:var(--dark);
+    margin-bottom:1.2rem;
+}
+.hero h1 em { font-style:italic; color:var(--coffee); }
+.hero-sub {
+    font-size:1.05rem; color:var(--dark);
+    max-width:400px; line-height:1.85; margin-bottom:2rem;
+}
+.hero-cta {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--coffee); color:var(--white);
+    text-decoration:none; padding:14px 32px;
+    border-radius:6px; font-size:13px; font-weight:600;
+    letter-spacing:0.05em; transition:all 0.3s;
+    box-shadow:0 6px 24px rgba(111,78,55,0.2);
+}
+.hero-cta:hover { background:var(--coffee-dark); transform:translateY(-2px); box-shadow:0 10px 30px rgba(111,78,55,0.25); }
+.hero-trust {
+    display:flex; gap:2rem; margin-top:2rem;
+    animation:fadeUp 0.9s ease 0.6s both;
+}
+.hero-trust span {
+    font-size:0.88rem; color:var(--dark-50); letter-spacing:0.02em;
+}
+.hero-trust strong { color:var(--dark-50); font-weight:600; }
+
+.hero-image-wrap {
+    position:relative;
+    animation:fadeUp 0.9s ease 0.4s both;
+}
+.hero-image {
+    width:100%; aspect-ratio:4/5;
+    object-fit:cover;
+    clip-path: ellipse(42% 48% at 50% 50%);
+    filter:brightness(0.95) contrast(1.03) saturate(0.95);
+    transition:clip-path 0.6s ease;
+}
+.hero-image-wrap:hover .hero-image {
+    clip-path: ellipse(46% 50% at 50% 50%);
+}
+.hero-image-wrap::after {
+    content:'';
+    position:absolute; inset:-6px;
+    border:1px solid var(--dark-10);
+    clip-path: ellipse(43% 49% at 50% 50%);
+    pointer-events:none;
+}
+
+/* ===== MENU ===== */
+.menu-section { padding:5rem 6vw; }
+.menu-tabs {
+    display:flex; gap:0; justify-content:center;
+    margin-bottom:2.5rem;
+    border-bottom:1px solid var(--dark-10);
+}
+.menu-tab {
+    padding:10px 28px;
+    font-family:var(--sans); font-size:13px; font-weight:500;
+    letter-spacing:0.06em;
+    background:none; border:none; border-bottom:2px solid transparent;
+    color:var(--dark-30); cursor:pointer;
+    transition:all 0.3s;
+}
+.menu-tab:hover { color:var(--coffee); }
+.menu-tab.active { color:var(--coffee); border-bottom-color:var(--coffee); }
+.menu-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:1px; background:var(--dark-10);
+    border:1px solid var(--dark-10);
+    border-radius:8px; overflow:hidden;
+    max-width:900px; margin:0 auto;
+}
+.menu-item {
+    background:var(--white);
+    padding:1.2rem 1.5rem;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem; transition:background 0.3s;
+}
+.menu-item:hover { background:rgba(111,78,55,0.02); }
+.mi-info h4 {
+    font-family:var(--serif); font-size:1.15rem; font-weight:400;
+    margin-bottom:0.1rem;
+}
+.mi-info span { font-size:0.88rem; color:var(--dark-30); }
+.mi-right { display:flex; align-items:center; gap:0.8rem; flex-shrink:0; }
+.mi-price {
+    font-family:var(--serif); font-size:1.2rem;
+    color:var(--coffee); white-space:nowrap;
+}
+.mi-order {
+    background:var(--coffee-pale); color:var(--coffee-dark);
+    border:none; padding:6px 14px; border-radius:4px;
+    font-family:var(--sans); font-size:13px; font-weight:600;
+    cursor:pointer; transition:all 0.3s; white-space:nowrap;
+}
+.mi-order:hover { background:var(--coffee); color:var(--white); }
+
+/* ===== ORIGINS ===== */
+.origins-section {
+    padding:5rem 6vw;
+    background:var(--white);
+    border-top:1px solid var(--dark-10);
+    border-bottom:1px solid var(--dark-10);
+}
+.origins-grid {
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    gap:1.5rem; max-width:900px; margin:0 auto;
+}
+.origin-card {
+    padding:2rem;
+    border:1px solid var(--dark-10);
+    border-radius:8px;
+    transition:all 0.4s;
+}
+.origin-card:hover {
+    border-color:var(--coffee-pale);
+    box-shadow:0 8px 30px rgba(111,78,55,0.08);
+    transform:translateY(-4px);
+}
+.origin-flag {
+    font-size:2rem; margin-bottom:0.8rem; line-height:1;
+}
+.origin-card h4 {
+    font-family:var(--serif); font-size:1.3rem;
+    margin-bottom:0.5rem;
+}
+.origin-meta {
+    font-size:0.95rem; color:var(--dark-50); line-height:1.7;
+}
+.origin-tag {
+    display:inline-block; margin-top:0.8rem;
+    font-size:13px; font-weight:600;
+    padding:6px 14px; border-radius:4px;
+    background:var(--sage-pale); color:var(--sage-dark);
+    letter-spacing:0.03em;
+}
+
+/* ===== INTERIOR STRIP ===== */
+.interior-strip {
+    position:relative; height:65vh; min-height:450px;
+    overflow:hidden;
+}
+.interior-strip img {
+    width:100%; height:120%; object-fit:cover;
+    position:absolute; top:-10%;
+    filter:brightness(0.55) saturate(0.85);
+    transition:transform 0.1s linear;
+}
+.strip-overlay {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+}
+.strip-features {
+    display:flex; gap:2.5rem;
+    color:rgba(255,255,255,0.88);
+    font-size:0.88rem; letter-spacing:0.03em;
+    flex-wrap:wrap; justify-content:center;
+    padding:0 24px;
+}
+.strip-feature { display:flex; align-items:center; gap:8px; }
+.strip-dot {
+    width:4px; height:4px; border-radius:50%;
+    background:var(--sage); flex-shrink:0;
+}
+
+/* ===== CONTACTS ===== */
+.contacts-section { padding:5rem 6vw; }
+.contacts-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:4rem; max-width:900px; margin:0 auto;
+    align-items:start;
+}
+.contacts-info h3 {
+    font-size:clamp(1.4rem, 2.5vw, 1.8rem);
+    margin-bottom:1.5rem;
+}
+.contact-line {
+    display:flex; gap:1rem; margin-bottom:1.2rem; align-items:flex-start;
+}
+.contact-line svg { width:18px; height:18px; color:var(--coffee); flex-shrink:0; margin-top:3px; }
+.contact-line p { font-size:0.9rem; color:var(--dark-50); line-height:1.7; }
+.contact-line strong { color:var(--dark); font-weight:500; display:block; margin-bottom:2px; }
+.contact-line a { color:var(--coffee); text-decoration:none; }
+
+.preorder-form {
+    background:var(--white);
+    border:1px solid var(--dark-10);
+    border-radius:8px;
+    padding:2rem;
+}
+.preorder-form h4 {
+    font-family:var(--serif); font-size:1.1rem;
+    margin-bottom:0.3rem;
+}
+.preorder-form .form-sub {
+    font-size:0.82rem; color:var(--dark-30); margin-bottom:1.5rem;
+}
+.preorder-form .fg {
+    display:flex; flex-direction:column; gap:0.3rem; margin-bottom:1rem;
+}
+.preorder-form label {
+    font-size:11px; font-weight:600; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--dark-30);
+}
+.preorder-form input, .preorder-form select {
+    background:var(--bg); border:1px solid var(--dark-10);
+    border-radius:6px; padding:12px 14px;
+    font-family:var(--sans); font-size:14px; color:var(--dark);
+    outline:none; transition:all 0.3s;
+}
+.preorder-form input:focus, .preorder-form select:focus {
+    border-color:var(--coffee); box-shadow:0 0 0 3px rgba(111,78,55,0.08);
+}
+.preorder-form select {
+    appearance:none; cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%236f4e37' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+}
+.btn-submit {
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--coffee); color:var(--white); border:none;
+    padding:14px; border-radius:6px;
+    font-family:var(--sans); font-size:13px; font-weight:600;
+    cursor:pointer; transition:all 0.3s;
+    margin-top:0.5rem;
+}
+.btn-submit:hover { background:var(--coffee-dark); }
+.btn-submit .btn-spinner {
+    display:none; width:16px; height:16px;
+    border:2px solid transparent; border-top-color:var(--white);
+    border-radius:50%; animation:spin 0.7s linear infinite;
+}
+.btn-submit.loading .btn-text { display:none; }
+.btn-submit.loading .btn-spinner { display:inline-block; }
+.btn-submit.sent { opacity:0.7; pointer-events:none; }
+
+/* ===== FOOTER ===== */
+footer {
+    padding:2rem 6vw;
+    border-top:1px solid var(--dark-10);
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:1rem;
+}
+footer .f-logo { font-family:var(--serif); font-size:16px; color:var(--dark); letter-spacing:0.06em; }
+footer .f-mid { font-size:0.78rem; color:var(--dark-30); }
+footer .f-links { display:flex; gap:1.5rem; list-style:none; }
+footer .f-links a { font-size:0.75rem; color:var(--dark-30); text-decoration:none; transition:color 0.3s; }
+footer .f-links a:hover { color:var(--coffee); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    position:fixed; inset:0; background:rgba(44,36,32,0.4);
+    backdrop-filter:blur(6px); z-index:10000;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transition:all 0.4s;
+}
+.modal-overlay.active { opacity:1; visibility:visible; }
+.modal-box {
+    background:var(--white); border-radius:12px;
+    padding:2.5rem; text-align:center;
+    max-width:360px; width:90%;
+    transform:scale(0.9) translateY(20px);
+    transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.modal-overlay.active .modal-box { transform:scale(1) translateY(0); }
+.modal-check { width:52px; height:52px; margin:0 auto 1rem; }
+.modal-check circle { fill:none; stroke:var(--coffee); stroke-width:2; stroke-dasharray:166; stroke-dashoffset:166; animation:mc 0.6s ease 0.2s forwards; }
+.modal-check polyline { fill:none; stroke:var(--coffee); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:48; stroke-dashoffset:48; animation:mt 0.4s ease 0.7s forwards; }
+@keyframes mc { to { stroke-dashoffset:0; } }
+@keyframes mt { to { stroke-dashoffset:0; } }
+.modal-title { font-family:var(--serif); font-size:1.3rem; margin-bottom:0.5rem; }
+.modal-text { font-size:0.85rem; color:var(--dark-50); margin-bottom:1.5rem; line-height:1.7; }
+.modal-close {
+    background:var(--coffee); color:var(--white); border:none;
+    padding:10px 24px; border-radius:6px;
+    font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.3s;
+}
+.modal-close:hover { background:var(--coffee-dark); }
+
+/* ===== FLOAT BUTTONS ===== */
+.float-msg {
+    position:fixed; bottom:1.5rem; right:1.5rem;
+    width:48px; height:48px; border-radius:14px;
+    z-index:999; overflow:hidden;
+    box-shadow:0 4px 20px rgba(88,86,214,0.35);
+    animation:msgP 2.5s ease-in-out infinite;
+    transition:transform 0.3s;
+    display:flex; align-items:center; justify-content:center;
+}
+.float-msg:hover { transform:scale(1.1); animation:none; }
+@keyframes msgP { 0%,100%{box-shadow:0 4px 20px rgba(88,86,214,0.35)} 50%{box-shadow:0 4px 30px rgba(88,86,214,0.5)} }
+.scroll-top {
+    position:fixed; bottom:1.5rem; right:5rem;
+    width:38px; height:38px; border-radius:50%;
+    background:var(--white); border:1px solid var(--dark-10);
+    color:var(--coffee); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:999;
+    opacity:0; visibility:hidden; transition:all 0.3s; text-decoration:none;
+}
+.scroll-top.visible { opacity:1; visibility:visible; }
+.scroll-top:hover { background:var(--coffee-pale); transform:translateY(-2px); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:768px) {
+    nav { padding:14px 20px; gap:0; justify-content:space-between; }
+    .nav-links {
+        position:fixed; top:0; right:-100%; width:70vw; height:100vh;
+        background:var(--bg); flex-direction:column;
+        align-items:center; justify-content:center; gap:1.5rem;
+        transition:right 0.4s;
+    }
+    .nav-links.open { right:0; }
+    .burger { display:flex; }
+    .hero { grid-template-columns:1fr; padding:120px 5vw 60px; gap:2rem; }
+    .hero-image-wrap { order:-1; max-width:280px; margin:0 auto; }
+    .hero-trust { flex-wrap:wrap; gap:1rem; }
+    .menu-tabs { overflow-x:auto; justify-content:flex-start; padding:0 4px; }
+    .menu-tab { padding:10px 18px; white-space:nowrap; }
+    .origins-grid { grid-template-columns:1fr; }
+    .contacts-grid { grid-template-columns:1fr; gap:2rem; }
+    .strip-features { flex-direction:column; gap:0.8rem; }
+    footer { flex-direction:column; text-align:center; }
+    .float-msg { width:44px; height:44px; border-radius:12px; bottom:1rem; right:1rem; }
+    .scroll-top { bottom:1rem; right:4.5rem; }
+}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"BREWCRAFT","image":"images/hero.jpg","servesCuisine":"Coffee","priceRange":"$","address":{"@type":"PostalAddress","streetAddress":"ул. Кофейная 5","addressLocality":"Москва","addressCountry":"RU"},"telephone":"+7 (495) 555-12-34","openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"07:30","closes":"22:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"22:00"}]}
+</script>
+</head>
+<body>
+<div class="bg-noise"></div>
+<div class="bg-texture"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+    <a href="#" class="nav-logo">BREWCRAFT</a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#menu">Меню</a></li>
+        <li><a href="#origins">Наш кофе</a></li>
+        <li><a href="#contacts">Контакты</a></li>
+    </ul>
+    <div class="burger" id="burger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+    <div class="hero-text">
+        <div class="hero-tag">Своя обжарка</div>
+        <h1>Спешелти кофе от <em>обжарщиков</em> -- зерно обжарено вчера</h1>
+        <p class="hero-sub">Зёрна из Эфиопии, Колумбии и Бразилии. Обжариваем сами, каждую неделю свежая партия.</p>
+        <a href="#menu" class="hero-cta">Посмотреть меню</a>
+        <div class="hero-trust">
+            <span><strong>Своя обжарка</strong></span>
+            <span><strong>12</strong> сортов</span>
+            <span>С <strong>2020</strong> года</span>
+        </div>
+    </div>
+    <div class="hero-image-wrap">
+        <img class="hero-image" src="images/hero.jpg" alt="Кофе BREWCRAFT">
+    </div>
+</section>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+    <div class="sec-header reveal" style="text-align:center;margin-bottom:0;">
+        <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:0.5rem;">Меню</h2>
+    </div>
+    <div class="menu-tabs reveal" id="menuTabs">
+        <button class="menu-tab active" onclick="filterMenu('coffee',this)">Кофе</button>
+        <button class="menu-tab" onclick="filterMenu('tea',this)">Чай</button>
+        <button class="menu-tab" onclick="filterMenu('pastry',this)">Выпечка</button>
+        <button class="menu-tab" onclick="filterMenu('breakfast',this)">Завтраки</button>
+    </div>
+    <div class="menu-grid reveal" id="menuGrid"></div>
+</section>
+
+<!-- ORIGINS -->
+<section class="origins-section" id="origins">
+    <div class="sec-header reveal" style="text-align:center;margin-bottom:2.5rem;">
+        <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);">Наш кофе</h2>
+    </div>
+    <div class="origins-grid">
+        <div class="origin-card reveal">
+            <div class="origin-flag">&#127466;&#127481;</div>
+            <h4>Эфиопия Йиргачеффе</h4>
+            <p class="origin-meta">Ягоды, жасмин, бергамот. Яркий и цветочный вкус с долгим послевкусием.</p>
+            <span class="origin-tag">Светлая обжарка</span>
+        </div>
+        <div class="origin-card reveal">
+            <div class="origin-flag">&#127464;&#127476;</div>
+            <h4>Колумбия Супремо</h4>
+            <p class="origin-meta">Молочный шоколад, карамель, грецкий орех. Плотное, сбалансированное тело.</p>
+            <span class="origin-tag">Средняя обжарка</span>
+        </div>
+        <div class="origin-card reveal">
+            <div class="origin-flag">&#127463;&#127479;</div>
+            <h4>Бразилия Сантос</h4>
+            <p class="origin-meta">Какао, фундук, специи. Классика для эспрессо и молочных напитков.</p>
+            <span class="origin-tag">Средняя обжарка</span>
+        </div>
+    </div>
+</section>
+
+<!-- INTERIOR -->
+<div class="interior-strip">
+    <img loading="lazy" src="images/interior.jpg" alt="Интерьер BREWCRAFT" id="parallaxImg">
+    <div class="strip-overlay">
+        <div class="strip-features">
+            <div class="strip-feature"><span class="strip-dot"></span> Уютное место для работы и встреч</div>
+            <div class="strip-feature"><span class="strip-dot"></span> Wi-Fi</div>
+            <div class="strip-feature"><span class="strip-dot"></span> Розетки у каждого стола</div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTACTS -->
+<section class="contacts-section" id="contacts">
+    <div class="contacts-grid">
+        <div class="contacts-info reveal">
+            <h3>Заходите на кофе</h3>
+            <div class="contact-line">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+                <p><strong>Адрес</strong>ул. Кофейная 5, Москва<br>м. Чистые пруды, 3 мин</p>
+            </div>
+            <div class="contact-line">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <p><strong>Часы работы</strong>Пн-Пт: 7:30 -- 22:00<br>Сб-Вс: 9:00 -- 22:00</p>
+            </div>
+            <div class="contact-line">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <p><strong>Телефон</strong><a href="tel:+74955551234">+7 (495) 555-12-34</a></p>
+            </div>
+        </div>
+
+        <div class="preorder-form reveal">
+            <h4>Закажи заранее</h4>
+            <p class="form-sub">Забери кофе без ожидания</p>
+            <form onsubmit="handleSubmit(event)">
+                <div class="fg">
+                    <label>Имя</label>
+                    <input type="text" name="name" placeholder="Ваше имя" required>
+                </div>
+                <div class="fg">
+                    <label>Телефон</label>
+                    <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required>
+                </div>
+                <div class="fg">
+                    <label>Что хотите</label>
+                    <select name="order" required>
+                        <option value="">Выберите</option>
+                        <option>Капучино</option>
+                        <option>Флэт уайт</option>
+                        <option>Фильтр-кофе</option>
+                        <option>Латте</option>
+                        <option>Эспрессо</option>
+                        <option>Раф</option>
+                        <option>Матча-латте</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label>Когда заберёте</label>
+                    <select name="time" required>
+                        <option value="">Выберите время</option>
+                        <option>Через 15 минут</option>
+                        <option>Через 30 минут</option>
+                        <option>Через 1 час</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="btn-text">Заказать</span>
+                    <span class="btn-spinner"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <span class="f-logo">BREWCRAFT</span>
+    <span class="f-mid">ул. Кофейная 5, Москва</span>
+    <ul class="f-links">
+        <li><a href="#">Telegram</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">VK</a></li>
+    </ul>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="successModal" onclick="closeModal(event)">
+    <div class="modal-box">
+        <svg class="modal-check" viewBox="0 0 52 52"><circle cx="26" cy="26" r="25"/><polyline points="16 26 23 33 36 20"/></svg>
+        <p class="modal-title">Заказ принят</p>
+        <p class="modal-text">Ваш кофе будет готов через 10-15 минут. Ждём вас!</p>
+        <button class="modal-close" onclick="document.getElementById('successModal').classList.remove('active')">Отлично</button>
+    </div>
+</div>
+
+<!-- MAX -->
+<a href="https://max.ru/" target="_blank" class="float-msg" aria-label="Max Messenger">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABAAEADASIAAhEBAxEB/8QAHAABAQADAQADAAAAAAAAAAAABwgEBQkGAAED/8QANBAAAQMCAwQHBwUBAAAAAAAAAQIDBAURAAYhEjFBcQcIEyJRYYEUFTJCkaHBUlNicrGS/8QAGQEAAgMBAAAAAAAAAAAAAAAABQYBBAcD/8QALhEAAQMCBQEGBgMAAAAAAAAAAQIDBAARBQYSIUExE1FhcZGhQoGxwfDxIjLh/9oADAMBAAIRAxEAPwCY8g5LdryFVCZttU9tWyLaKeUN4HgBxPpy96miw4DfZxIjTKR+lOp5necI0LLjVGoEKltIATGYSg6b1Wuo+pJOMCPl+fV6qxTKZEclTJC9hppA1J/AG8k6AY0jCIjMFsEgauT+cUonElS3TY7cCj52OQd2PyaivPq2Y7Lj6hwaQVn7Ysro26vWXKUy1OzahFaqBAUY5JEVo+GzvcPmrTywy02nU+mxxGp0GNDZToG2GktpHokDHOVm9lpWllBX43sPvR+PHWBdW1c0jHkRHLSWHo9/3W1I/wBAxt6eq1sdGZ0KJOjqjzYrEllXxNvNhaTzB0wP9JPQBlitsOzcrtNUGp6qCGwfZXT4KR8nNP0OJiZwYdUEvoKPG9x89gfrRiM8GzvUsyaZTapG7GoQWJKTp30ajkd49MFHSLktWX1CfAK3ac4rZ72qmVHcCeIPA+h822pUmpUGrSKRV4q4s2MrZdaXw8CDuII1BGhGMGuQW6pRZcB0ApfaUjkbaH0Njgpi2FMYgwVADVa4I9t+QaYXIzcpnpvwaYKvBSsEpGFroKybHotF9/SWQahUE3QpQ1bZ+UDw2viPp4YOnWO3dba/cWEfU2/OKNjtIYYbYaGyhtIQkeAAsMK+YJJQylpPxdfIVjWUmu1UpxXw2t5n9V8fdaYZW884htptJUtazZKQBckngMBmdesXTKdMci5boq6qhBt7U892LSvNIAKiPM2xvusvV5EbKkaixllHvF09uQdS0ixKeRUU+gOJfnRLE6YnL+Asymu3kC4PQfemqRN0u9mnjrTxlLrL0qVNbi5noTtKbWbGXHe7dtHmpNgoDzF+WHqFKjTYjMyG+3IjvIDjTragpK0kXBBG8HHPOXGtfTFI9TfMcqRR6tlaU4pbdPUiREub7CHCoKQPIKFwP5HFnMGW2Y8Yyowtp6jrsdri/jV1pWtN69L1lsls1rKisyRGR7ypKNtZSNXY9++k+Oz8Q5K8cTCg6YvSbHalw3oj6Qpp5tTa0nilQsR9DiDXmTGlvRibllxTX/KiPxixlKWp2OthXwEW8jx6j3pkwZ4kFB4pvSoIeadPyOJV9CDiiEkKSFA3B1GJ2UNpJB4jDnk2b7wyvT5RN1FkJX/ZPdP3GA2YmyUIX3XHr+qyHJbwC3WjyAfT90WdZRpZl0Z2x2C08kc7oOAye0k30xWfSRk9vOFOixjK9kdjv7aXdjb7pFlC1xwseYx4zMHQbSpSEGk1eTDWEAKD6A8lZ8d4Iv8ATBLA8ehxYrbLyrEX4PfemGRCfVJU4kbG30qYprI10xQHVFyxIhUyrZnktKbRUCiPFuLbbbZJUseRUbD+pxs8u9AVHjzESK/VXqmhJv7M032LavJRuVEeQIwxxY7EWM3GjMtsstJCG20JCUoSBYAAbhicw5mYkxjFjb6rXPTYb2F9+tFIyFoT/KvqbIaiQ3pT6ghpltTi1HglIuT9BiCXpHtUt6UdO2dW7/0on84prrOZ4ZoeVF5ZhvA1OrI2XAk6tR799R8Nr4RzUeGJdaOLeT4C2oy5Cx/ci3kL7+p9qYsKGklXfTJk6ssZhyrTK3GUFNzIyHDY/Cq1lJ5hQI9MNfRA+F5bfYKgVNSld2+oBAP+3xzy6CulheSXFUesIdkUN9zbujVcVZ3qSOKTxT6jW4NPUTM1Dr8MSqDW4sxChr2D1lDyUnRQ5EYDpcbxWMGtVlbXrHQw9gE8u6NSDex4sfHvFP2Y88ZeoMpmLMmbbq1WWlkbZaH6l23Dy3+WN1TKlT6nHTIp81iU0oXCmnAofbdiYpqN+mNLKCkEqQooPik2P2x3GVWVoAS4Qrvtcen+0ci5jccUSpAt+c1Xc2bDgsl6bLYjNDUrecCEj1JwSdJXTrQqLFdiZY2KxUSCEui/szR8Sr5+SdPMYA6kFOG7ilOH+RJ/3GhnI34KYdk6MhYW+sr8Og+e5P0o4zO7XoLVjVirVGt1eTVatLclzZK9t11Z1J4AcAANABoBjBqs9um0iVPdICWGlK5ngPU2GMWpVGBTQpybLZYSP1K1PIbzgxz5m5VbIhQgtuA2ra72inVcCRwA4DB7HcWjYbHKUkarWSke23AFH2ZIbRfmv//Z" alt="Max" style="width:100%;height:100%;border-radius:4px">
+</a>
+<a href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="scroll-top" id="scrollTop" aria-label="Наверх">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 15l-6-6-6 6"/></svg>
+</a>
+
+<script>
+// Menu data
+const menuData = {
+    coffee: [
+        { name:'Эспрессо', vol:'30 мл', price:180 },
+        { name:'Капучино', vol:'250 мл', price:280 },
+        { name:'Флэт уайт', vol:'200 мл', price:350 },
+        { name:'Латте', vol:'300 мл', price:320 },
+        { name:'Фильтр-кофе', vol:'250 мл', price:220 },
+        { name:'Раф', vol:'300 мл', price:350 },
+        { name:'Бамбл', vol:'300 мл', price:390 },
+    ],
+    tea: [
+        { name:'Сенча', vol:'400 мл', price:220 },
+        { name:'Улун молочный', vol:'400 мл', price:250 },
+        { name:'Иван-чай', vol:'400 мл', price:180 },
+        { name:'Матча-латте', vol:'300 мл', price:350 },
+    ],
+    pastry: [
+        { name:'Круассан', vol:'', price:180 },
+        { name:'Банановый хлеб', vol:'', price:220 },
+        { name:'Кардамоновый ролл', vol:'', price:250 },
+        { name:'Морковный кейк', vol:'кусочек', price:290 },
+    ],
+    breakfast: [
+        { name:'Авокадо-тост', vol:'', price:390 },
+        { name:'Сырники', vol:'3 шт', price:350 },
+        { name:'Гранола с йогуртом', vol:'', price:320 },
+        { name:'Яйца Бенедикт', vol:'2 шт', price:420 },
+    ],
+};
+
+function renderMenu(cat) {
+    const grid = document.getElementById('menuGrid');
+    grid.innerHTML = menuData[cat].map(item => `
+        <div class="menu-item">
+            <div class="mi-info"><h4>${item.name}</h4>${item.vol ? `<span>${item.vol}</span>` : ''}</div>
+            <div class="mi-right">
+                <span class="mi-price">${item.price} р.</span>
+                <button class="mi-order" onclick="this.textContent='Готово';this.style.background='var(--sage)';this.style.color='#fff';setTimeout(()=>{this.textContent='Заказать';this.style.background='';this.style.color=''},1500)">Заказать</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterMenu(cat, btn) {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderMenu(cat);
+}
+
+// Nav
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 500);
+});
+
+function toggleMenu() {
+    document.getElementById('navLinks').classList.toggle('open');
+    document.getElementById('burger').classList.toggle('active');
+}
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+        document.getElementById('burger').classList.remove('active');
+    });
+});
+
+// Reveal
+const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+        if (e.isIntersecting) { setTimeout(() => e.target.classList.add('vis'), i * 80); obs.unobserve(e.target); }
+    });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Parallax
+window.addEventListener('scroll', () => {
+    const img = document.getElementById('parallaxImg');
+    if (img) {
+        const rect = img.parentElement.getBoundingClientRect();
+        const speed = 0.3;
+        img.style.transform = `translateY(${rect.top * speed * -0.1}px)`;
+    }
+});
+
+// Form
+function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const form = e.target;
+    btn.classList.add('loading');
+
+    /* === TELEGRAM BOT API ===
+    const BOT_TOKEN = 'YOUR_BOT_TOKEN';
+    const CHAT_ID = 'YOUR_CHAT_ID';
+    const fd = new FormData(form);
+    const text = `Предзаказ BREWCRAFT:%0A` +
+        `Имя: ${fd.get('name')||'-'}%0A` +
+        `Тел: ${fd.get('phone')||'-'}%0A` +
+        `Заказ: ${fd.get('order')||'-'}%0A` +
+        `Когда: ${fd.get('time')||'-'}`;
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`)
+        .then(() => showOk(btn, form)).catch(() => showOk(btn, form));
+    return;
+    === END === */
+
+    setTimeout(() => showOk(btn, form), 1000);
+}
+function showOk(btn, form) {
+    btn.classList.remove('loading');
+    btn.classList.add('sent');
+    btn.querySelector('.btn-text').textContent = 'Принято';
+    document.getElementById('successModal').classList.add('active');
+    form.reset();
+    setTimeout(() => { btn.classList.remove('sent'); btn.querySelector('.btn-text').textContent = 'Заказать'; }, 4000);
+}
+function closeModal(e) { if (e.target === e.currentTarget) e.currentTarget.classList.remove('active'); }
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const t = document.querySelector(this.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior:'smooth' });
+    });
+});
+
+// Init
+renderMenu('coffee');
+</script>
+</body>
+</html>
