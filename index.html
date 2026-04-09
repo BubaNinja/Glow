@@ -208,8 +208,14 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
 .mm-name{font-size:1.1rem;color:var(--white)}
 .mm-role{font-size:0.82rem;color:var(--pink)}
 .mm-services{display:flex;flex-direction:column;gap:0}
-.mm-svc{display:flex;justify-content:space-between;align-items:center;padding:10px 8px;border-bottom:1px solid var(--glass-border);cursor:pointer;transition:background 0.3s;border-radius:6px}
+.mm-svc{display:flex;justify-content:space-between;align-items:center;padding:10px 8px;border-bottom:1px solid var(--glass-border);cursor:pointer;transition:background 0.3s;border-radius:6px;gap:12px}
 .mm-svc:hover{background:var(--pink-dim)}
+.mm-svc.selected{background:var(--pink-dim);border-color:var(--pink)}
+.mm-check{width:20px;height:20px;border-radius:4px;border:1.5px solid var(--glass-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
+.mm-svc.selected .mm-check{background:var(--pink);border-color:var(--pink)}
+.mm-svc.selected .mm-check::after{content:'';width:6px;height:10px;border:solid var(--white);border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
+.mm-total{display:flex;justify-content:space-between;padding:12px 0;margin-top:8px;font-size:0.95rem;font-weight:600;color:var(--white);opacity:0;max-height:0;transition:all 0.3s;overflow:hidden}
+.mm-total.show{opacity:1;max-height:40px}
 .mm-svc-name{font-size:0.9rem;color:var(--text-bright)}
 .mm-svc-price{font-size:0.95rem;color:var(--peach);font-weight:600}
 .mm-book{width:100%;margin-top:1.5rem;background:linear-gradient(135deg,var(--pink),var(--violet));color:var(--white);border:none;padding:14px;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s}
@@ -270,7 +276,7 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
         <p class="hero-sub">12 мастеров с опытом от 5 лет. Премиальная косметика. Гарантия: не понравится -- вернём деньги.</p>
         <div class="hero-btns">
             <a href="#masters" class="btn-neon">Выбрать мастера</a>
-            <a href="#booking" class="btn-outline">Наши цены</a>
+            
         </div>
         <div class="hero-trust">
             <span><strong>8 лет</strong> работы</span>
@@ -455,7 +461,8 @@ footer{padding:4rem 5vw 2rem;border-top:1px solid var(--glass-border)}
             <div><div class="mm-name" id="mmName"></div><div class="mm-role" id="mmRole"></div></div>
         </div>
         <div class="mm-services" id="mmServices"></div>
-        <button class="mm-book" onclick="bookMaster()">Записаться без выбора услуги</button>
+        <div class="mm-total" id="mmTotal"><span>Итого:</span><span id="mmTotalPrice">0 р.</span></div>
+        <button class="mm-book" onclick="bookWithServices()">Записаться</button>
     </div>
 </div>
 
@@ -509,38 +516,55 @@ const masters = [
 
 let currentMasterIdx = null;
 
+let selectedServices = [];
+
 function openMaster(i) {
     currentMasterIdx = i;
+    selectedServices = [];
     const m = masters[i];
     document.getElementById('mmAvatar').src = m.photo;
     document.getElementById('mmName').textContent = m.name;
     document.getElementById('mmRole').textContent = m.role;
-    document.getElementById('mmServices').innerHTML = m.services.map(s =>
-        `<div class="mm-svc" onclick="pickService('${s.name}')" style="cursor:pointer;transition:background 0.3s;border-radius:6px;padding:10px 8px"><span class="mm-svc-name">${s.name}</span><span class="mm-svc-price">${s.price}</span></div>`
+    document.getElementById('mmServices').innerHTML = m.services.map((s, idx) =>
+        `<div class="mm-svc" onclick="toggleService(${i},${idx},this)" data-price="${parseInt(s.price.replace(/\D/g,''))}"><div class="mm-check"></div><span class="mm-svc-name">${s.name}</span><span class="mm-svc-price">${s.price}</span></div>`
     ).join('');
+    document.getElementById('mmTotal').classList.remove('show');
+    document.getElementById('mmTotalPrice').textContent = '0 р.';
     document.getElementById('masterModal').classList.add('active');
 }
 
-function bookMaster() {
-    document.getElementById('masterModal').classList.remove('active');
-    const sel = document.getElementById('masterSelect');
-    sel.value = currentMasterIdx;
-    updateServices();
-    document.getElementById('booking').scrollIntoView({behavior:'smooth'});
+function toggleService(masterIdx, svcIdx, el) {
+    el.classList.toggle('selected');
+    const svc = masters[masterIdx].services[svcIdx];
+    const idx = selectedServices.findIndex(s => s.name === svc.name);
+    if (idx >= 0) selectedServices.splice(idx, 1);
+    else selectedServices.push(svc);
+    // Update total
+    const total = selectedServices.reduce((sum, s) => sum + parseInt(s.price.replace(/\D/g, '')), 0);
+    const totalEl = document.getElementById('mmTotal');
+    const priceEl = document.getElementById('mmTotalPrice');
+    if (total > 0) {
+        totalEl.classList.add('show');
+        priceEl.textContent = total.toLocaleString('ru-RU') + ' р.';
+    } else {
+        totalEl.classList.remove('show');
+    }
 }
 
-function pickService(serviceName) {
+function bookWithServices() {
     document.getElementById('masterModal').classList.remove('active');
     const sel = document.getElementById('masterSelect');
     sel.value = currentMasterIdx;
     updateServices();
-    // Pre-select the clicked service
-    setTimeout(() => {
-        const svcSel = document.getElementById('serviceSelect');
-        for (let opt of svcSel.options) {
-            if (opt.value === serviceName) { opt.selected = true; break; }
-        }
-    }, 50);
+    // Pre-select first chosen service if any
+    if (selectedServices.length > 0) {
+        setTimeout(() => {
+            const svcSel = document.getElementById('serviceSelect');
+            for (let opt of svcSel.options) {
+                if (opt.value === selectedServices[0].name) { opt.selected = true; break; }
+            }
+        }, 50);
+    }
     document.getElementById('booking').scrollIntoView({behavior:'smooth'});
 }
 
